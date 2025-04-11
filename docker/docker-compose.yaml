@@ -460,7 +460,7 @@ x-shared-env: &shared-api-worker-env
 services:
   # API service
   api:
-    image: dify-api:1.2.0
+    image: dify-api:latest
     restart: always
     environment:
       # Use the shared environment variables.
@@ -487,7 +487,7 @@ services:
   # worker service
   # The Celery worker for processing the queue.
   worker:
-    image: dify-api:1.2.0
+    image: dify-api:latest
     restart: always
     environment:
       # Use the shared environment variables.
