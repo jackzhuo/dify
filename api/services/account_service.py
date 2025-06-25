@@ -616,6 +616,7 @@ class TenantService:
         available_ta = (
             db.session.query(TenantAccountJoin)
             .filter_by(account_id=account.id)
+            .filter_by(role="owner")
             .order_by(TenantAccountJoin.id.asc())
             .first()
         )
