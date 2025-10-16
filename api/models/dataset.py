@@ -8,17 +8,15 @@ import os
 import pickle
 import re
 import time
+import uuid
 from datetime import datetime
 from json import JSONDecodeError
 from typing import Any, Optional, cast
 
 import sqlalchemy as sa
-from sqlalchemy import DateTime, String, func, select
+from sqlalchemy import DateTime, String, event, func, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, mapped_column
-
-from sqlalchemy import event
-import uuid
 
 from configs import dify_config
 from core.rag.index_processor.constant.built_in_field import BuiltInField, MetadataDataSource
