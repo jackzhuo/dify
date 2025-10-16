@@ -8,13 +8,12 @@ import os
 import pickle
 import re
 import time
-import uuid
 from datetime import datetime
 from json import JSONDecodeError
 from typing import Any, Optional, cast
 
 import sqlalchemy as sa
-from sqlalchemy import DateTime, String, event, func, select
+from sqlalchemy import DateTime, String, func, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
@@ -914,9 +913,6 @@ class AppDatasetJoin(Base):
     def app(self):
         return db.session.get(App, self.app_id)
 
-def set_uuid_if_empty(mapper, connection, target):
-    if getattr(target, 'created_by', None) in (None, ""):
-        target.created_by = str(uuid.uuid4())
 
 class DatasetQuery(Base):
     __tablename__ = "dataset_queries"
@@ -931,11 +927,9 @@ class DatasetQuery(Base):
     source: Mapped[str] = mapped_column(String(255), nullable=False)
     source_app_id = mapped_column(StringUUID, nullable=True)
     created_by_role = mapped_column(String, nullable=False)
-    created_by = mapped_column(StringUUID)
+    created_by = mapped_column(StringUUID, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=db.func.current_timestamp())
 
-event.listen(DatasetQuery, 'before_insert', set_uuid_if_empty)
-event.listen(DatasetQuery, 'before_update', set_uuid_if_empty)
 
 class DatasetKeywordTable(Base):
     __tablename__ = "dataset_keyword_tables"
