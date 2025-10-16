@@ -17,6 +17,9 @@ from sqlalchemy import DateTime, String, func, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, Session, mapped_column
 
+from sqlalchemy import event
+import uuid
+
 from configs import dify_config
 from core.rag.index_processor.constant.built_in_field import BuiltInField, MetadataDataSource
 from core.rag.retrieval.retrieval_methods import RetrievalMethod
@@ -913,6 +916,9 @@ class AppDatasetJoin(Base):
     def app(self):
         return db.session.get(App, self.app_id)
 
+def set_uuid_if_empty(mapper, connection, target):
+    if getattr(target, 'created_by', None) in (None, ""):
+        target.created_by = str(uuid.uuid4())
 
 class DatasetQuery(Base):
     __tablename__ = "dataset_queries"
@@ -930,6 +936,8 @@ class DatasetQuery(Base):
     created_by = mapped_column(StringUUID, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, server_default=db.func.current_timestamp())
 
+event.listen(DatasetQuery, 'before_insert', set_uuid_if_empty)
+event.listen(DatasetQuery, 'before_update', set_uuid_if_empty)
 
 class DatasetKeywordTable(Base):
     __tablename__ = "dataset_keyword_tables"
